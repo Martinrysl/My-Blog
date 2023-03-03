@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, jsonify
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
@@ -102,6 +102,17 @@ def edit_post(post_id):
         return redirect("/")
 
     return render_template("make-post.html", form=edit_form, is_edit=True)
+
+
+@app.route("/delete/<int:post_id>", methods=["GET", "POST"])
+def delete_post(post_id):
+    post = BlogPost.query.get(post_id)
+    if post:
+        db.session.delete(post)
+        db.session.commit()
+        return redirect("/")
+    else:
+        return jsonify(error={"Not Found": "Sorry the post with that id was not found in the database."}), 404
 
 
 if __name__ == "__main__":
